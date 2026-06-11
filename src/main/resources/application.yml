@@ -5,8 +5,12 @@ spring:
   cloud:
     gateway:
       default-filters:
+        - RemoveRequestHeader=Forwarded
         - RemoveRequestHeader=X-Forwarded-Host
         - RemoveRequestHeader=X-Forwarded-Prefix
+        - RemoveRequestHeader=X-Forwarded-For
+        - RemoveRequestHeader=X-Forwarded-Proto
+        - RemoveRequestHeader=X-Forwarded-Port
 
       routes:
         # Donadores y Entidades
