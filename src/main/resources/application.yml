@@ -9,15 +9,8 @@ spring:
         - id: modulo_donadores
           uri: https://donadoresyentidades-hxss.onrender.com/
           predicates:
-            - Path=/donadores/**
-            - Method=POST
-            - Method=GET,
-            - /entidades/**
-            - Method=POST
-            - Method=GET,
-            - /necesidades/**
-            - Method=POST
-            - Method=GET
+            - Path=/donadores/**, /entidades/**, /necesidades/**
+            - Method=GET,POST
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
@@ -25,12 +18,8 @@ spring:
         - id: modulo_donaciones
           uri: https://tu-api-donaciones.onrender.com
           predicates:
-            - Path=/donaciones/**
-            - Method=POST
-            - Method=GET
-            - ,/productos/**
-            - Method=POST
-            - Method=GET
+            - Path=/donaciones/**, /productos/**
+            - Method=GET,POST
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
@@ -48,4 +37,4 @@ spring:
           predicates:
             - Path=/incentivos/**, /misiones/**, /insignias/**
           filters:
-            - AddRequestHeader=X-Gateway-Request, true
+            - AddRequestHeader=X-Gateway-Request, trueer=X-Gateway-Request, true
