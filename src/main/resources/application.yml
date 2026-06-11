@@ -27,7 +27,7 @@ spring:
           uri: https://tu-api-donaciones.onrender.com
           predicates:
             - Path=/donaciones/**, /productos/**
-            - Method=GET,POST
+            - Method=GET,POST,DELETE,PATCH,PUT
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
