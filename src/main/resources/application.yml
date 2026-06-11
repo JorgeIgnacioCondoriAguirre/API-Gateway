@@ -4,13 +4,18 @@ server:
 spring:
   cloud:
     gateway:
+      # --- ESTA ES LA MAGIA QUE ROMPE EL BUCLE INFINITO ---
+      default-filters:
+        - RemoveRequestHeader=X-Forwarded-Host
+        - RemoveRequestHeader=X-Forwarded-Prefix
+
       routes:
         # Donadores y Entidades
         - id: modulo_donadores
-          uri: https://donadoresyentidades-hxss.onrender.com/
+          uri: https://donadoresyentidades-hxss.onrender.com # <-- ¡Sin la barra al final!
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
-            - Method=GET,POST
+            - Method=GET,POST,DELETE,PATCH,PUT # Agregué los demás por si los necesitas luego
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
@@ -37,4 +42,4 @@ spring:
           predicates:
             - Path=/incentivos/**, /misiones/**, /insignias/**
           filters:
-            - AddRequestHeader=X-Gateway-Request, trueer=X-Gateway-Request, true
+            - AddRequestHeader=X-Gateway-Request, true
