@@ -1,0 +1,37 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Donadores y Entidades
+        - id: modulo_donadores
+          uri: https://donadoresyentidades-hxss.onrender.com/
+          predicates:
+            - Path=/donadores/**, /entidades/**, /necesidades/** # Mapea los controladores locales
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Donaciones
+        - id: modulo_donaciones
+          uri: https://tu-api-donaciones.onrender.com
+          predicates:
+            - Path=/donaciones/**, /productos/**
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Logística
+        - id: modulo_logistica
+          uri: https://tu-api-logistica.onrender.com
+          predicates:
+            - Path=/logistica/**, /depositos/**
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Incentivos
+          uri: https://tu-api-incentivos.onrender.com
+          predicates:
+            - Path=/incentivos/**, /misiones/**, /insignias/**
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
