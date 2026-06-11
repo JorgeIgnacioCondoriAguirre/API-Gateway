@@ -12,10 +12,10 @@ spring:
       routes:
         # Donadores y Entidades
         - id: modulo_donadores
-          uri: https://donadoresyentidades-hxss.onrender.com # <-- ¡Sin la barra al final!
+          uri: https://donadoresyentidades-hxss.onrender.com
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
-            - Method=GET,POST,DELETE,PATCH,PUT # Agregué los demás por si los necesitas luego
+            - Method=GET,POST,DELETE,PATCH,PUT
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
