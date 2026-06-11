@@ -30,6 +30,7 @@ spring:
             - AddRequestHeader=X-Gateway-Request, true
 
         # Incentivos
+        - id: modulo_incentivos
           uri: https://tu-api-incentivos.onrender.com
           predicates:
             - Path=/incentivos/**, /misiones/**, /insignias/**
