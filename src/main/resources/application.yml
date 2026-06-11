@@ -4,7 +4,6 @@ server:
 spring:
   cloud:
     gateway:
-      # --- ESTA ES LA MAGIA QUE ROMPE EL BUCLE INFINITO ---
       default-filters:
         - RemoveRequestHeader=X-Forwarded-Host
         - RemoveRequestHeader=X-Forwarded-Prefix
