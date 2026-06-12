@@ -24,7 +24,7 @@ spring:
 
         # Donaciones
         - id: donaciones
-          uri:
+          uri: https://donaciones.onrender.com
           predicates:
             - Path=/donaciones/**, /productos/**, /categorias/**, /identificadores/**
             - Method=GET,POST,DELETE,PATCH
