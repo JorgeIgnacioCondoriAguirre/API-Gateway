@@ -45,6 +45,6 @@ spring:
           uri: https://entrega-2-lseijasferraudo.onrender.com
           predicates:
             - Path=/insignias/**, /misiones/**
-            - Method=GET,POST,DELETE,PATCH,PUT
+            - Method=GET,POST
           filters:
             - AddRequestHeader=X-Gateway-Request, true
