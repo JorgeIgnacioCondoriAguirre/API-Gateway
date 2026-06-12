@@ -35,7 +35,7 @@ spring:
         - id: logistica
           uri: https://tpa-logistica-spinelliriso.onrender.com
           predicates:
-            - Path=/logistica/**, /asignaciones/**, /entregas/**
+            - Path=/depositos/**, /asignaciones/**, /entregas/**
             - Method=GET,POST
           filters:
             - AddRequestHeader=X-Gateway-Request, true
