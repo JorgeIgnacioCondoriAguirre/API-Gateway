@@ -5,6 +5,7 @@ spring:
   cloud:
     gateway:
       default-filters:
+        - RemoveRequestHeader=Host
         - RemoveRequestHeader=Forwarded
         - RemoveRequestHeader=X-Forwarded-Host
         - RemoveRequestHeader=X-Forwarded-Prefix
@@ -18,7 +19,7 @@ spring:
           uri: https://donadoresyentidades-hxss.onrender.com
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
-            - Method=GET,POST,DELETE,PATCH,PUT
+            - Method=GET,POST,DELETE,PATCH
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
