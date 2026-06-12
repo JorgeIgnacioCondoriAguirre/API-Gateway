@@ -14,7 +14,7 @@ spring:
 
       routes:
         # Donadores y Entidades
-        - id: modulo_donadores
+        - id: donadoresYEntidades
           uri: https://donadoresyentidades-hxss.onrender.com
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
@@ -23,26 +23,28 @@ spring:
             - AddRequestHeader=X-Gateway-Request, true
 
         # Donaciones
-        - id: modulo_donaciones
-          uri: https://tu-api-donaciones.onrender.com
+        - id: donaciones
+          uri:
           predicates:
-            - Path=/donaciones/**, /productos/**
-            - Method=GET,POST,DELETE,PATCH,PUT
+            - Path=/donaciones/**, /productos/**, /categorias/**, /identificadores/**
+            - Method=GET,POST,DELETE,PATCH
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
         # Logística
-        - id: modulo_logistica
-          uri: https://tu-api-logistica.onrender.com
+        - id: logistica
+          uri: https://tpa-logistica-spinelliriso.onrender.com
           predicates:
-            - Path=/logistica/**, /depositos/**
+            - Path=/logistica/**, /asignaciones/**, /entregas/**
+            - Method=GET,POST
           filters:
             - AddRequestHeader=X-Gateway-Request, true
 
         # Incentivos
-        - id: modulo_incentivos
-          uri: https://tu-api-incentivos.onrender.com
+        - id: incentivos
+          uri: https://entrega-2-lseijasferraudo.onrender.com
           predicates:
-            - Path=/incentivos/**, /misiones/**, /insignias/**
+            - Path=/insignias/**, /misiones/**
+            - Method=GET,POST,DELETE,PATCH,PUT
           filters:
             - AddRequestHeader=X-Gateway-Request, true
