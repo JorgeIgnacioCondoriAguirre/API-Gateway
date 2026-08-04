@@ -16,7 +16,7 @@ spring:
       routes:
         # Donadores y Entidades
         - id: donadoresYEntidades
-          uri: https://donadoresyentidades-hxss.onrender.com
+          uri: ${DONADORESYENTIDADES}
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
             - Method=GET,POST,DELETE,PATCH
@@ -25,7 +25,7 @@ spring:
 
         # Donaciones
         - id: donaciones
-          uri: https://donaciones-1-7xzd.onrender.com
+          uri: ${DONACIONES}
           predicates:
             - Path=/donaciones/**, /productos/**, /categorias/**, /identificadores/**
             - Method=GET,POST,DELETE,PATCH
@@ -34,7 +34,7 @@ spring:
 
         # Logística
         - id: logistica
-          uri: https://tpa-logistica-spinelliriso.onrender.com
+          uri: ${LOGISTICA}
           predicates:
             - Path=/depositos/**, /asignaciones/**, /entregas/**
             - Method=GET,POST
@@ -43,7 +43,7 @@ spring:
 
         # Incentivos
         - id: incentivos
-          uri: https://entrega-2-lseijasferraudo.onrender.com
+          uri: ${INCENTIVOS}
           predicates:
             - Path=/insignias/**, /misiones/**
             - Method=GET,POST
