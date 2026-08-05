@@ -2,6 +2,7 @@ package ar.edu.utn.dds.gateway.service;
 
 import ar.edu.utn.dds.gateway.restClients.ApiExternaService;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         if (comando.equals("/donadores")) {
             return "Opciones de Donador (Ingresá el comando para ejecutar):\n" +
                     "/registro - Registrarse\n" +
-                    "/mis_estadisticas - Consultar sus estadísticas\n" +
+                    "/mis_estadisticas [ID] - Consultar sus estadísticas\n" +
                     "/consultar_donadores - Ver todos los donadores\n" +
                     "/consultar_donador_id [ID] - Buscar donador por ID";
         }
@@ -73,62 +74,152 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                     "/consultar_necesidad [ID] - Consulta de necesidad";
         }
 
-        if(comando.startsWith("/registro")){
-            //return "Consultando sistema...\n\n" + apiService.postDonador();
+        if (comando.startsWith("/registro")) {
+            String datosCrudos = comando.replace("/registro", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para registrarte, enviá tus datos separados por coma.\n" +
+                        "Ejemplo: `/registro Nombre, Apellido, Edad, Email, DNI, Domicilio`";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return apiService.registrarDonador(datos[0].trim(),
+                            datos[1].trim(),
+                            Integer.parseInt(datos[2].trim()),
+                            datos[3].trim(),
+                            datos[4].trim(),
+                            datos[5].trim());
+                } catch (NumberFormatException e) {
+                    return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+                }
         }
 
         if (comando.startsWith("/consultar_donador_id")) {
-            String[] partes = comando.split(" ");
-            if (partes.length == 2) {
-                String donadorID = partes[1];
-                return "Buscando donador " + donadorID + "...\n" + apiService.consultarDonadorPorID(donadorID);
-            } else {
+            String[] partes = comando.split(" ",2);
+            try {
+                return apiService.consultarDonadorPorID(partes[1].trim());
+            } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
             }
         }
 
         if (comando.startsWith("/consultar_donadores")){
-            return "Consultando sistema...\n\n" + apiService.consultarTodosLosDonadores();
+            return apiService.consultarTodosLosDonadores();
         }
 
         if (comando.startsWith("/mis_estadisticas")) {
-            String[] partes = comando.split(" ");
-            if (partes.length == 2) {
-                String donadorID = partes[1];
-                return "Buscando donador " + donadorID + "...\n" + apiService.consultarEstadisticasDeUnDonador(donadorID);
-            } else {
-                return "Comando incompleto. Usa el formato: /donadores/id [ID]";
+            String[] partes = comando.split(" ",2);
+            try {
+                return apiService.consultarEstadisticasDeUnDonador(partes[1].trim());
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /mis_estadisticas [ID]";
+            }
+        }
+
+        if(comando.startsWith("/crear_entidad")){
+            String datosCrudos = comando.replace("/crear_entidad", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una entidad, enviá los datos separados por coma.\n" +
+                        "Ejemplo: /crear_entidad Razon social, Domicilio, Telefono, Correo";
+            }
+            String[] datos = datosCrudos.split(",",4);
+
+            try {
+                return apiService.crearEntidad(datos[0].trim(),
+                            datos[1].trim(),
+                            datos[2].trim(),
+                            datos[3].trim());
+                } catch (NumberFormatException e) {
+                    return "Faltan o sobran datos. Asegurate de enviar los 4 datos separados por comas";
+                }
+        }
+
+        if(comando.startsWith("/editar_entidad")){
+            String datosCrudos = comando.replace("/editar_entidad", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para modificar una entidad benefica, enviá el ID y la nueva razon social separados por coma.\n" +
+                        "Ejemplo: /editar_entidad ID, Razon social";
+            }
+            String[] partes = comando.split(",",2);
+            try{
+                return apiService.editarEntidad(partes[0].trim(), partes[1].trim());
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /editar_entidad [ID]";
             }
         }
 
         if(comando.startsWith("/consultar_entidades")){
-            return "Consultando sistema...\n\n" + apiService.consultarTodasLasEntidades();
+            return apiService.consultarTodasLasEntidades();
         }
 
         if (comando.startsWith("/consultar_entidad_id")) {
+            String[] partes = comando.split(" ",2);
+            try {
+                return apiService.consultarEntidadPorID(partes[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
+            }
+        }
+
+        if(comando.startsWith("/alta_necesidad")){
+            String datosCrudos = comando.replace("/alta_necesidad", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para dar de alta una necesidad, enviá los datos separados por coma.\n" +
+                        "Ejemplo: /alta_necesidad EntidadID, Nivel de urgencia, Descripcion, Cantidad objetivo, ProductoSolicitadoID, Tipo de necesidad";
+            }
+            String[] datos = datosCrudos.split(",",6);
+
+            try {
+                return apiService.altaNecesidad(
+                        datos[0].trim(),
+                        Integer.parseInt(datos[1].trim()),
+                        datos[2].trim(),
+                        Integer.parseInt(datos[3].trim()),
+                        datos[4].trim(),
+                        TipoNecesidadMaterialEnum.valueOf(datos[5].trim()));
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+            }
+        }
+
+        if(comando.startsWith("/borrar_necesidad")){
             String[] partes = comando.split(" ");
             if (partes.length == 2) {
-                String entidadID = partes[1];
-                return "Buscando donador " + entidadID + "...\n" + apiService.consultarEntidadPorID(entidadID);
+                return apiService.borrarNecesidad(partes[1].trim());
             } else {
-                return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
+                return "Comando incompleto. Usa el formato: /borrar_necesidad [ID]";
+            }
+        }
+
+        if(comando.startsWith("/modificar_necesidad")){
+            String datosCrudos = comando.replace("/modificar_necesidad", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para modificar una necesidad, enviá el ID y *** separados por coma.\n" +
+                        "Ejemplo: /modificar_necesidad ID, ***";
+            }
+            String[] partes = comando.split(",",2);
+            try{
+                return apiService.modificarNecesidad(partes[0].trim(), partes[1].trim());
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /modificar_necesidad [ID]";
             }
         }
 
         if(comando.startsWith("/consultar_necesidad")) {
-            String[] partes = comando.split(" ");
-            if (partes.length == 2) {
-                String necesidadID = partes[1];
-                return "Buscando donador " + necesidadID + "...\n" + apiService.consultarNecesidadPorID(necesidadID);
-            } else {
-                return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
+            String[] partes = comando.split(" ",2);
+            try {
+                return apiService.consultarNecesidadPorID(partes[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_necesidad [ID]";
             }
         }
-
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
     }
-
-
 
     private void enviarMensaje(String chatId, String texto) {
         SendMessage message = new SendMessage(chatId, texto);

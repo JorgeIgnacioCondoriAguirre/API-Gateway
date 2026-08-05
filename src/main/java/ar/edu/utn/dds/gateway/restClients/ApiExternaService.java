@@ -3,6 +3,7 @@ package ar.edu.utn.dds.gateway.restClients;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
@@ -18,24 +19,28 @@ public class ApiExternaService {
                 .build();
     }
 
-    public String postDonador(DonadorDTO donadorDTO) {
-//        try {
-//            restClient.post()
-//                    .uri("/donadores")
-//                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-//                    .body(String.class)
-//                    .retrieve()
-//                    .toBodilessEntity();
-//        } catch (Exception e) {
-//            return "Hubo un error al conectar con la API: " + e.getMessage();
-//        }
-        return "String";
+    public String registrarDonador(String nombre, String apellido, Integer edad, String email, String nroDocumento, String domicilio) {
+        try {
+        DonadorDTO donador = new DonadorDTO("", nombre, apellido, edad, email, nroDocumento, domicilio, EstadoDonadorEnum.VERIFICADO, "Ocasional");
+
+        restClient.post()
+                .uri("/donadores")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(donador)
+                .retrieve()
+                .toBodilessEntity();
+
+        return "Donador registrado exitosamente";
+
+        } catch (Exception e) {
+        return "Hubo un error al registrar el donador: " + e.getMessage();
+        }
     }
 
     public String consultarEstadisticasDeUnDonador(String donadorID) {
         try {
             String jsonCrudo = restClient.get()
-                    .uri("/estadisticas/{donadorID}")
+                    .uri("/estadisticas/{donadorID}",donadorID)
                     .retrieve()
                     .body(String.class);
             ObjectMapper mapper = new ObjectMapper();
@@ -78,6 +83,23 @@ public class ApiExternaService {
         }
     }
 
+    public String crearEntidad(String razonSocial, String domicilio, String telefono, String correo) {
+        try {
+            EntidadBeneficaDTO entidadBenefica = new EntidadBeneficaDTO("", razonSocial, domicilio, telefono, correo);
+            restClient.post()
+                    .uri("/entidades")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(entidadBenefica)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            return "Entidad benefica registrada exitosamente";
+
+        } catch (Exception e) {
+            return "Hubo un error al registrar la entidad benefica: " + e.getMessage();
+        }
+    }
+
     public String consultarTodasLasEntidades() {
         try {
             String jsonCrudo = restClient.get()
@@ -109,6 +131,24 @@ public class ApiExternaService {
         }
     }
 
+    public String editarEntidad(String entidadID, String razonSocial){
+        try {
+            EntidadBeneficaDTO entidadBenefica = new EntidadBeneficaDTO("", razonSocial, "", "", "");
+
+            restClient.patch()
+                    .uri("/entidades/{entidadID}/razon-social", entidadID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(entidadBenefica)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            return "Entidad benéfica modificada exitosamente";
+
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
     public String consultarNecesidadPorID(String necesidadID){
         try {
             String jsonCrudo = restClient.get()
@@ -124,6 +164,56 @@ public class ApiExternaService {
             return "Hubo un error o el ID no existe: " + e.getMessage();
         }
     }
+
+    public String altaNecesidad(String entidadID, Integer nivelDeUrgencia, String descripcion, Integer cantidadObjetivo, String productoSolicitadoID, TipoNecesidadMaterialEnum tipo){
+        try{
+            NecesidadMaterialDTO necesidadMaterial = new NecesidadMaterialDTO("",entidadID,nivelDeUrgencia,descripcion,cantidadObjetivo,productoSolicitadoID,tipo);
+            restClient.post()
+                    .uri("/necesidades")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(necesidadMaterial)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            return "Necesidad de material registrada exitosamente";
+
+        } catch (Exception e) {
+            return "Hubo un error al registrar la necesidad de material: " + e.getMessage();
+        }
+    }
+
+    public String modificarNecesidad(String necesidadID, String m) {
+        try {
+            NecesidadMaterialDTO necesidadMaterial = new NecesidadMaterialDTO("", "", 0, "", 0, "", TipoNecesidadMaterialEnum.valueOf(""));
+
+            restClient.patch()
+                    .uri("/necesidades/{necesidadID}/***", necesidadID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(necesidadMaterial)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            return "Necesidad modificada exitosamente";
+
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
+    public String borrarNecesidad(String necesidadID) {
+        try {
+            restClient.delete()
+                    .uri("/necesidad/{necesidadID}", necesidadID)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            return "Necesidad borrada exitosamente";
+
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
 
 
 
