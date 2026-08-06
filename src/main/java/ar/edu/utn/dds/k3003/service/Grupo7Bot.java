@@ -1,8 +1,6 @@
-package ar.edu.utn.dds.gateway.service;
+package ar.edu.utn.dds.k3003.service;
 
-import ar.edu.utn.dds.gateway.restClients.ApiExternaService;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
+import ar.edu.utn.dds.k3003.clients.ApiExternaService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -65,13 +63,14 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         if (comando.equals("/Admin")) {
             return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
                     "/crear_entidad - Crear una entidad\n" +
-                    "/editar_entidad [ID] - Editar una entidad\n" +
-                    "/consultar_entidades - Consultar todas\n" +
-                    "/consultar_entidad_id [ID] - Consultar por ID\n" +
+                    "/editar_entidad - Editar una entidad\n" +
+                    "/consultar_entidades - Ver todas las entidades\n" +
+                    "/consultar_entidad_id [ID] - Buscar entidad por ID\n" +
                     "/alta_necesidad - Alta de una necesidad\n" +
                     "/borrar_necesidad [ID] - Borrar necesidad\n" +
-                    "/modificar_necesidad [ID] - Modificar necesidad\n" +
-                    "/consultar_necesidad [ID] - Consulta de necesidad";
+                    "/modificar_necesidad - Modificar necesidad\n" +
+                    "/consultar_necesidades - Ver todas las necesidades\n" +
+                    "/consultar_necesidad [ID] - Ver todas las necesidad de un producto";
         }
 
         if (comando.startsWith("/registro")) {
@@ -96,9 +95,9 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         }
 
         if (comando.startsWith("/consultar_donador_id")) {
-            String[] partes = comando.split(" ",2);
+            String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarDonadorPorID(partes[1].trim());
+                return apiService.consultarDonadorPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
             }
@@ -109,9 +108,9 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         }
 
         if (comando.startsWith("/mis_estadisticas")) {
-            String[] partes = comando.split(" ",2);
+            String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarEstadisticasDeUnDonador(partes[1].trim());
+                return apiService.consultarEstadisticasDeUnDonador(datos[1].trim());
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /mis_estadisticas [ID]";
             }
@@ -138,14 +137,13 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
         if(comando.startsWith("/editar_entidad")){
             String datosCrudos = comando.replace("/editar_entidad", "").trim();
-
             if (datosCrudos.isEmpty()) {
                 return "Para modificar una entidad benefica, enviá el ID y la nueva razon social separados por coma.\n" +
                         "Ejemplo: /editar_entidad ID, Razon social";
             }
-            String[] partes = comando.split(",",2);
+            String[] datos = datosCrudos.split(",",2);
             try{
-                return apiService.editarEntidad(partes[0].trim(), partes[1].trim());
+                return apiService.editarEntidad(datos[0].trim(), datos[1].trim());
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /editar_entidad [ID]";
             }
@@ -156,9 +154,9 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         }
 
         if (comando.startsWith("/consultar_entidad_id")) {
-            String[] partes = comando.split(" ",2);
+            String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarEntidadPorID(partes[1].trim());
+                return apiService.consultarEntidadPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
             }
@@ -171,7 +169,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Para dar de alta una necesidad, enviá los datos separados por coma.\n" +
                         "Ejemplo: /alta_necesidad EntidadID, Nivel de urgencia, Descripcion, Cantidad objetivo, ProductoSolicitadoID, Tipo de necesidad";
             }
-            String[] datos = datosCrudos.split(",",6);
+            String[] datos = datosCrudos.split(",",5);
 
             try {
                 return apiService.altaNecesidad(
@@ -179,18 +177,18 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                         Integer.parseInt(datos[1].trim()),
                         datos[2].trim(),
                         Integer.parseInt(datos[3].trim()),
-                        datos[4].trim(),
-                        TipoNecesidadMaterialEnum.valueOf(datos[5].trim()));
+                        datos[4].trim());
+                        //TipoNecesidadMaterialEnum.valueOf(datos[5].trim()));
             } catch (NumberFormatException e) {
                 return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
             }
         }
 
         if(comando.startsWith("/borrar_necesidad")){
-            String[] partes = comando.split(" ");
-            if (partes.length == 2) {
-                return apiService.borrarNecesidad(partes[1].trim());
-            } else {
+            String[] datos = comando.split(" ",2);
+            try {
+                return apiService.borrarNecesidad(datos[1].trim());
+            } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /borrar_necesidad [ID]";
             }
         }
@@ -202,18 +200,22 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Para modificar una necesidad, enviá el ID y *** separados por coma.\n" +
                         "Ejemplo: /modificar_necesidad ID, ***";
             }
-            String[] partes = comando.split(",",2);
+            String[] datos = datosCrudos.split(",",2);
             try{
-                return apiService.modificarNecesidad(partes[0].trim(), partes[1].trim());
+                return apiService.modificarNecesidad(datos[0].trim(), Integer.parseInt(datos[1].trim()));
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /modificar_necesidad [ID]";
             }
         }
 
+        if (comando.startsWith("/consultar_necesidades")){
+            return apiService.consultarTodasLasNecesidades();
+        }
+
         if(comando.startsWith("/consultar_necesidad")) {
-            String[] partes = comando.split(" ",2);
+            String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarNecesidadPorID(partes[1].trim());
+                return apiService.consultarNecesidadPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_necesidad [ID]";
             }
